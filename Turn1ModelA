@@ -1,0 +1,39 @@
+from pythreejs import *
+import numpy as np
+from IPython.display import display
+
+# Function to create a sphere
+def create_sphere(radius, color, position=[0, 0, 0]):
+    vertices = [[-1,-1, 1],[1,-1, 1],[1, 1, 1],[-1, 1, 1],
+                [-1,-1,-1],[1,-1,-1],[1, 1,-1],[-1, 1,-1]]
+    faces = [[0, 1, 2],[2, 3, 0],[1, 5, 6],[6, 2, 1],
+             [5, 4, 7],[7, 6, 5],[4, 0, 3],[3, 7, 4],
+             [0, 5, 1],[0, 4, 5],[3, 2, 6],[3, 6, 7]]
+    geometry = BufferGeometry(
+        attributes=dict(
+            position=BufferAttribute(np.array(vertices, dtype=np.float32) * radius, normalized=False),
+        ),
+        indices=np.array(faces, dtype=np.uint32)
+    )
+    material = MeshBasicMaterial(color=color)
+    mesh = Mesh(geometry=geometry, material=material)
+    mesh.position = position
+    return mesh
+
+# Creating objects for solar system
+sun = create_sphere(10, '#ffff00')
+mercury = create_sphere(1, '#999999', [15, 0, 0])
+venus = create_sphere(2, '#ccccaa', [25, 0, 0])
+earth = create_sphere(2, '#0000ff', [35, 0, 0])
+mars = create_sphere(1.5, '#ff0000', [45, 0, 0])
+
+# Scene and camera
+camera = PerspectiveCamera(position=[0, 100, 100], fov=20, aspect=800/600, near=0.1, far=1000)
+scene = Scene(children=[sun, mercury, venus, earth, mars, AmbientLight(color='#cccccc')])
+controller = OrbitControls(controlling=camera)
+
+# Renderer
+renderer = Renderer(camera=camera, scene=scene, controls=[controller], width=800, height=600)
+
+# Display
+display(renderer)
